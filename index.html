@@ -26,7 +26,7 @@
     <script>
         // 建構子 ScoreOutputer 接受一個字串，該字串為 csv 的檔案名稱
         // 以下面範例，檔名就為 "109598105(總分: 6).csv"
-        var so = new ScoreOutputer("109598105");
+        var so = new ScoreOutputer("109598085");
         so.installCSS(function () {
             // 安裝 bootstrap 的 css，如果在 html 上方引用 bootstrap 5.1.1 的話就不用使用 installCSS ，注意一定要 bootstrap css 5.1.1 版
             // installCSS 接收一個 callback 當作參數，作為成功安裝 bootstrap css 的回呼函式
@@ -38,8 +38,8 @@
             //有幾個項目就呼叫幾個 addChild
             //addChild 要比 renderModal 先呼叫
             so.addChild("繪製出 5 個畫面", 1, true);
-            so.addChild("回答問題", 1, false);
-            so.addChild("可按鍵選擇上 / 下一隻角色", 1, false);
+            so.addChild("回答問題", 1, true);
+            so.addChild("可按鍵選擇上 / 下一隻角色", 1, true);
             so.addChild("讀取作業 2 儲存的座標點在眼睛上繪製出分割線", 1, false);
             so.addChild("可選擇當下控制哪個虹膜", 1, false);
             so.addChild("按滑鼠左鍵控制虹膜移動，右鍵停止", 2, false);
@@ -82,6 +82,7 @@
         import { OutlineEffect } from './jsm/effects/OutlineEffect.js';
         import { MMDLoader } from './jsm/loaders/MMDLoader.js';
         import { MMDAnimationHelper } from './jsm/animation/MMDAnimationHelper.js';
+        import { Character } from './character.js';
 
         let scene, renderer, effect;
         let mesh, helper;
@@ -90,6 +91,86 @@
         let aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
         let frustumSize = 30;
         let camera, camera2, camera3, camera4, camera5;
+        const modelFile = ['models/mmd/kizunaai/kizunaai.pmx', "models/mmd/るいのれ式物述有栖_配布用フォルダ/物述有栖.pmx", "models/mmd/『天宮こころ(Kokoro Amamiya)』/『天宮こころ(Kokoro Amamiya)』.pmx"];
+        let color_hex = [0xFF0000, 0x008000, 0x800080, 0x0000FF]; // 紅綠紅綠，紫藍紫藍
+        let role = [];
+        let role_now = 0;
+        let coor_json_data;
+
+        function onDocumentKeyPress(event) {
+
+            const keyCode = event.which;
+
+            const ch = String.fromCharCode(keyCode);
+
+            switch (ch) {
+                case "q":
+                case "Q":
+                    role[role_now].left_copy_to_right(line_amount);
+                    break;
+
+                case "a":
+                case "A":
+                    role[role_now].set_Visible(false);
+                    if (role_now - 1 < 0)
+                        role_now = 0;
+                    else
+                        role_now = role_now - 1;
+                    role[role_now].set_Visible(true);
+                    // role[role_now].mesh.pose();
+                    // console.log(ch);
+                    break;
+
+                case "d":
+                case "D":
+                    role[role_now].set_Visible(false);
+                    if (role_now + 1 > role.length - 1)
+                        role_now = role.length - 1;
+                    else
+                        role_now = role_now + 1;
+                    role[role_now].set_Visible(true);
+                    // role[role_now].mesh.pose();
+                    // console.log(ch);
+                    break;
+                case "s":
+                case "S":
+                    let json_data = JSON.stringify(make_all_character_json(), null, 4);
+                    download(json_data, 'model_data_test.json', 'text/plain');
+                    break;
+            }
+
+        }
+
+        function readTextFile(file, callback) {
+            let rawFile = new XMLHttpRequest();
+            rawFile.overrideMimeType("application/json");
+            rawFile.open("GET", file, true);
+            rawFile.onreadystatechange = function () {
+                if (rawFile.readyState === 4 && rawFile.status == "200") {
+                    callback(rawFile.responseText);
+                }
+            }
+            rawFile.send(null);
+        }
+
+
+        //usage:
+        readTextFile("./model_data_test.json", function (text) {
+            coor_json_data = JSON.parse(text);
+            // console.log(json_data);
+            //console.log(json_data.modellist[0].location);
+
+            /* for (let i = 0; i < json_data.modellist.length; i++) {
+                model_path[i] = json_data.modellist[i].location;
+                console.log(model_path[i]);
+            } */
+
+            /* for (let i = 0; i < json_data.modellist.length; i++) {
+                for (let j in json_data.modellist[i]) {
+                    console.log(json_data.modellist[i][j]);
+                }
+            } */
+        });
 
         Ammo().then(function (AmmoLib) {
 
@@ -97,8 +178,14 @@
 
             init();
             animate();
-
         });
+
+        function initRoles() {
+            for (let i = 0; i < modelFile.length; i++) {
+                role[i] = new Character(scene, modelFile[i], 0, color_hex);
+                // console.log(modelFile[i]);
+            }
+        }
 
         function init() {
 
@@ -135,6 +222,9 @@
             effect = new OutlineEffect(renderer);
 
             // model
+
+            initRoles();
+
             function onProgress(xhr) {
 
                 if (xhr.lengthComputable) {
@@ -146,25 +236,33 @@
 
             }
 
-            const modelFile = 'models/mmd/kizunaai/kizunaai.pmx';
-
-            helper = new MMDAnimationHelper();
+            // helper = new MMDAnimationHelper();
 
             const loader = new MMDLoader();
 
-            loader.load(modelFile, function (object) {
+            for (let i = 0; i < role.length; i++) {
 
-                mesh = object;
-                mesh.position.y = - 10;
+                loader.load(modelFile[i], function (object) {
 
-                scene.add(mesh);
+                    role[i].mesh = object;
+                    role[i].mesh.position.y = - 10;
+                    if (i == role_now)
+                        role[i].set_Visible(true);
+                    else
+                        role[i].set_Visible(false);
+                    scene.add(role[i].mesh);
 
-            }, onProgress, null);
+                    console.log("finished?");
+                }, onProgress, null);
+            }
+
+            console.log(role.length);
 
             //
 
             window.addEventListener('resize', onWindowResize);
             //鏡頭控制
+            document.addEventListener('keypress', onDocumentKeyPress);
 
         }
 

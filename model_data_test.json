@@ -1,0 +1,37 @@
+{
+    "modellist": [
+        {
+            "location": "models/mmd/kizunaai/kizunaai.pmx",
+            "line_locationx_1": 0.256128770542085,
+            "line_locationy_1": 8.010483617343592,
+            "line_locationx_2": 0.256128770542085,
+            "line_locationy_2": 8.403924669174938,
+            "line_locationx_3": 0.7278584314299228,
+            "line_locationy_3": 8.403924669174938,
+            "line_locationx_4": 0.7278584314299228,
+            "line_locationy_4": 8.010483617343592
+        },
+        {
+            "location": "models/mmd/るいのれ式物述有栖_配布用フォルダ/物述有栖.pmx",
+            "line_locationx_1": 0.30998008428391327,
+            "line_locationy_1": 4.322287292809602,
+            "line_locationx_2": 0.30998008428391327,
+            "line_locationy_2": 4.741703451792222,
+            "line_locationx_3": 0.7821083035223689,
+            "line_locationy_3": 4.741703451792222,
+            "line_locationx_4": 0.7821083035223689,
+            "line_locationy_4": 4.322287292809602
+        },
+        {
+            "location": "models/mmd/『天宮こころ(Kokoro Amamiya)』/『天宮こころ(Kokoro Amamiya)』.pmx",
+            "line_locationx_1": 0.291583112590938,
+            "line_locationy_1": 5.338100543228519,
+            "line_locationx_2": 0.291583112590938,
+            "line_locationy_2": 5.583078596606221,
+            "line_locationx_3": 0.7595187201663227,
+            "line_locationy_3": 5.583078596606221,
+            "line_locationx_4": 0.7595187201663227,
+            "line_locationy_4": 5.338100543228519
+        }
+    ]
+}

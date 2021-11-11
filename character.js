@@ -8,12 +8,12 @@ export class Character {
         this.eye_edges = [];
         // 0~3 是左眼的邊框 0是下方 1是左側 2是上方 3是右側
         // 4~7 是右眼的邊框 4是下方 5是左側 6是上方 7是右側
-        for (let i = 0; i < line_amount * 2; i++) {
+        /*for (let i = 0; i < line_amount * 2; i++) {
             this.eye_edges[i] = new Edge(color_hex[i]);
             scene.add(this.eye_edges[i].line);
-        }
+        }*/
 
-        this.mesh = 0;
+        // this.mesh = 0;
         this.file_path = file_path;
     }
 
