@@ -92,10 +92,11 @@
         let frustumSize = 30;
         let camera, camera2, camera3, camera4, camera5;
         const modelFile = ['models/mmd/kizunaai/kizunaai.pmx', "models/mmd/るいのれ式物述有栖_配布用フォルダ/物述有栖.pmx", "models/mmd/『天宮こころ(Kokoro Amamiya)』/『天宮こころ(Kokoro Amamiya)』.pmx"];
-        let color_hex = [0xFF0000, 0x008000, 0x800080, 0x0000FF]; // 紅綠紅綠，紫藍紫藍
+        let color_hex = [0x008000, 0xFF0000, 0x0000FF, 0x800080]; // 左眼橫綠直紅，右眼橫藍直紫
         let role = [];
         let role_now = 0;
         let coor_json_data;
+        let line_amount = 4;
 
         function onDocumentKeyPress(event) {
 
@@ -165,11 +166,11 @@
                 console.log(model_path[i]);
             } */
 
-            /* for (let i = 0; i < json_data.modellist.length; i++) {
-                for (let j in json_data.modellist[i]) {
-                    console.log(json_data.modellist[i][j]);
+            for (let i = 0; i < coor_json_data.modellist.length; i++) {
+                for (let j in coor_json_data.modellist[i]) {
+                    console.log(coor_json_data.modellist[i][j]);
                 }
-            } */
+            }
         });
 
         Ammo().then(function (AmmoLib) {
@@ -196,6 +197,11 @@
             camera3 = new THREE.OrthographicCamera(0.25 * frustumSize * aspect / - 2, 0.25 * frustumSize * aspect / 2, 0.5 * frustumSize / 2, 0.5 * frustumSize / - 2, 0.1, 1000);
             camera4 = new THREE.OrthographicCamera(0.25 * frustumSize * aspect / - 2, 0.25 * frustumSize * aspect / 2, 0.5 * frustumSize / 2, 0.5 * frustumSize / - 2, 0.1, 1000);
             camera5 = new THREE.OrthographicCamera(0.25 * frustumSize * aspect / - 2, 0.25 * frustumSize * aspect / 2, 0.5 * frustumSize / 2, 0.5 * frustumSize / - 2, 0.1, 1000);
+            console.log("before");
+            console.log(camera2.left);
+            console.log(camera2.right);
+            console.log(camera2.top);
+            console.log(camera2.bottom);
             camera.position.z = 30;
             camera2.position.z = 30;
             camera3.position.z = 30;
@@ -224,6 +230,8 @@
             // model
 
             initRoles();
+
+
 
             function onProgress(xhr) {
 
@@ -254,9 +262,12 @@
 
                     console.log("finished?");
                 }, onProgress, null);
+
+                role[i].set_Location(coor_json_data.modellist[i]);
             }
 
             console.log(role.length);
+            onWindowResize();
 
             //
 
@@ -280,10 +291,21 @@
             camera.bottom = - frustumSize / 2;
             camera.updateProjectionMatrix();
 
-            camera2.left = 0.25 * frustumSize * aspect / - 2;
-            camera2.right = 0.25 * frustumSize * aspect / 2;
-            camera2.top = 0.5 * frustumSize / 2;
-            camera2.bottom = - 0.5 * frustumSize / 2;
+            // camera2.left = 0.25 * frustumSize * aspect / - 2;
+            camera2.left = -(role[role_now].x2 + 0.25);// * aspect / -2;
+            // camera2.right = 0.25 * frustumSize * aspect / 2;
+            camera2.right = (role[role_now].x2 + 0.25);// * aspect / 2;
+            const camera_length = camera2.right - camera2.left;
+            // camera2.top = 0.5 * frustumSize / 2;
+            camera2.top = (role[role_now].y2 + 1);// * aspect / 2;
+            // camera2.bottom = - 0.5 * frustumSize / 2;
+            camera2.bottom = camera2.top - camera_length / aspect;
+            //camera2.bottom = (role[role_now].y1 - 1);// * aspect / -2; 
+            console.log("after");
+            console.log(camera2.left);
+            console.log(camera2.right);
+            console.log(camera2.top);
+            console.log(camera2.bottom);
             camera2.updateProjectionMatrix();
 
             camera3.left = 0.25 * frustumSize * aspect / - 2;

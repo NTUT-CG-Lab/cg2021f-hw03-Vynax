@@ -6,15 +6,45 @@ import * as THREE from './build/three.module.js';
 export class Character {
     constructor(scene, file_path, line_amount, color_hex) {
         this.eye_edges = [];
-        // 0~3 是左眼的邊框 0是下方 1是左側 2是上方 3是右側
-        // 4~7 是右眼的邊框 4是下方 5是左側 6是上方 7是右側
-        /*for (let i = 0; i < line_amount * 2; i++) {
-            this.eye_edges[i] = new Edge(color_hex[i]);
-            scene.add(this.eye_edges[i].line);
-        }*/
+        this.horizon_line = 5;
+        this.vertical_line = 9;
+        this.left_horizon_edges = [];
+        this.left_vertical_edges = [];
+        this.right_horizon_edges = [];
+        this.right_vertical_edges = [];
 
+        for (let i = 0; i < this.horizon_line; i++) {
+            this.left_horizon_edges[i] = new Edge(color_hex[0]);
+            this.right_horizon_edges[i] = new Edge(color_hex[2]);
+            scene.add(this.left_horizon_edges[i].line);
+            scene.add(this.right_horizon_edges[i].line);
+        }
+
+        for (let i = 0; i < this.vertical_line; i++) {
+            this.left_vertical_edges[i] = new Edge(color_hex[1]);
+            this.right_vertical_edges[i] = new Edge(color_hex[3]);
+            scene.add(this.left_vertical_edges[i].line);
+            scene.add(this.right_vertical_edges[i].line);
+        }
+
+        this.x1 = 0;
+        this.x2 = 0;
+        this.y1 = 0;
+        this.y2 = 0;
         // this.mesh = 0;
         this.file_path = file_path;
+    }
+
+    set_Location(json_data) {
+        this.x1 = json_data['line_locationx_1'];
+        this.x2 = json_data['line_locationx_3'];
+        this.y1 = json_data['line_locationy_1'];
+        this.y2 = json_data['line_locationy_2'];
+
+        console.log("x1" + this.x1);
+        console.log("x2" + this.x2);
+        console.log("y1" + this.y1);
+        console.log("y1" + this.y2);
     }
 
     set_Line_Points(edge_now, point1, point2) {
