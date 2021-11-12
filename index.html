@@ -118,8 +118,7 @@
                     else
                         role_now = role_now - 1;
                     role[role_now].set_Visible(true);
-                    // role[role_now].mesh.pose();
-                    // console.log(ch);
+                    onWindowResize();
                     break;
 
                 case "d":
@@ -130,8 +129,7 @@
                     else
                         role_now = role_now + 1;
                     role[role_now].set_Visible(true);
-                    // role[role_now].mesh.pose();
-                    // console.log(ch);
+                    onWindowResize();
                     break;
                 case "s":
                 case "S":
@@ -292,14 +290,14 @@
             camera.updateProjectionMatrix();
 
             // camera2.left = 0.25 * frustumSize * aspect / - 2;
-            camera2.left = -(role[role_now].x2 + 0.25);// * aspect / -2;
+            camera2.left = -(role[role_now].x2 + 0.15);// * aspect / -2;
             // camera2.right = 0.25 * frustumSize * aspect / 2;
-            camera2.right = (role[role_now].x2 + 0.25);// * aspect / 2;
+            camera2.right = (role[role_now].x2 + 0.15);// * aspect / 2;
             const camera_length = camera2.right - camera2.left;
             // camera2.top = 0.5 * frustumSize / 2;
-            camera2.top = (role[role_now].y2 + 1);// * aspect / 2;
+            camera2.top = (role[role_now].y2 + 0.5);// * aspect / 2;
             // camera2.bottom = - 0.5 * frustumSize / 2;
-            camera2.bottom = camera2.top - camera_length / aspect;
+            camera2.bottom = camera2.top - camera_length + 0.15;
             //camera2.bottom = (role[role_now].y1 - 1);// * aspect / -2; 
             console.log("after");
             console.log(camera2.left);
