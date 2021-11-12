@@ -40,7 +40,7 @@
             so.addChild("繪製出 5 個畫面", 1, true);
             so.addChild("回答問題", 1, true);
             so.addChild("可按鍵選擇上 / 下一隻角色", 1, true);
-            so.addChild("讀取作業 2 儲存的座標點在眼睛上繪製出分割線", 1, false);
+            so.addChild("讀取作業 2 儲存的座標點在眼睛上繪製出分割線", 1, true);
             so.addChild("可選擇當下控制哪個虹膜", 1, false);
             so.addChild("按滑鼠左鍵控制虹膜移動，右鍵停止", 2, false);
             so.addChild("複製參數至對應目標參數", 2, false);
@@ -91,8 +91,10 @@
         let aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
         let frustumSize = 30;
         let camera, camera2, camera3, camera4, camera5;
+        let small_cameras = [];
+        let camera_x_range;
         const modelFile = ['models/mmd/kizunaai/kizunaai.pmx', "models/mmd/るいのれ式物述有栖_配布用フォルダ/物述有栖.pmx", "models/mmd/『天宮こころ(Kokoro Amamiya)』/『天宮こころ(Kokoro Amamiya)』.pmx"];
-        let color_hex = [0x008000, 0xFF0000, 0x0000FF, 0x800080]; // 左眼橫綠直紅，右眼橫藍直紫
+        let color_hex = [0x008000, 0xFF0000, 0x68c4dd, 0x800080]; // 左眼橫綠直紅，右眼橫藍直紫
         let role = [];
         let role_now = 0;
         let coor_json_data;
@@ -191,20 +193,12 @@
             const container = document.createElement('div');
             document.body.appendChild(container);
             camera = new THREE.OrthographicCamera(0.5 * frustumSize * aspect / - 2, 0.5 * frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 0.1, 1000);
-            camera2 = new THREE.OrthographicCamera(0.25 * frustumSize * aspect / - 2, 0.25 * frustumSize * aspect / 2, 0.5 * frustumSize / 2, 0.5 * frustumSize / - 2, 0.1, 1000);
-            camera3 = new THREE.OrthographicCamera(0.25 * frustumSize * aspect / - 2, 0.25 * frustumSize * aspect / 2, 0.5 * frustumSize / 2, 0.5 * frustumSize / - 2, 0.1, 1000);
-            camera4 = new THREE.OrthographicCamera(0.25 * frustumSize * aspect / - 2, 0.25 * frustumSize * aspect / 2, 0.5 * frustumSize / 2, 0.5 * frustumSize / - 2, 0.1, 1000);
-            camera5 = new THREE.OrthographicCamera(0.25 * frustumSize * aspect / - 2, 0.25 * frustumSize * aspect / 2, 0.5 * frustumSize / 2, 0.5 * frustumSize / - 2, 0.1, 1000);
-            console.log("before");
-            console.log(camera2.left);
-            console.log(camera2.right);
-            console.log(camera2.top);
-            console.log(camera2.bottom);
             camera.position.z = 30;
-            camera2.position.z = 30;
-            camera3.position.z = 30;
-            camera4.position.z = 30;
-            camera5.position.z = 30;
+
+            for (let i = 0; i < 4; i++) {
+                small_cameras[i] = new THREE.OrthographicCamera(0.25 * frustumSize * aspect / - 2, 0.25 * frustumSize * aspect / 2, 0.5 * frustumSize / 2, 0.5 * frustumSize / - 2, 0.1, 1000);
+                small_cameras[i].position.z = 30;
+            }
 
             // scene
 
@@ -248,6 +242,7 @@
 
             for (let i = 0; i < role.length; i++) {
 
+                role[i].set_Location(coor_json_data.modellist[i]);
                 loader.load(modelFile[i], function (object) {
 
                     role[i].mesh = object;
@@ -261,7 +256,6 @@
                     console.log("finished?");
                 }, onProgress, null);
 
-                role[i].set_Location(coor_json_data.modellist[i]);
             }
 
             console.log(role.length);
@@ -289,40 +283,21 @@
             camera.bottom = - frustumSize / 2;
             camera.updateProjectionMatrix();
 
-            // camera2.left = 0.25 * frustumSize * aspect / - 2;
-            camera2.left = -(role[role_now].x2 + 0.15);// * aspect / -2;
-            // camera2.right = 0.25 * frustumSize * aspect / 2;
-            camera2.right = (role[role_now].x2 + 0.15);// * aspect / 2;
-            const camera_length = camera2.right - camera2.left;
-            // camera2.top = 0.5 * frustumSize / 2;
-            camera2.top = (role[role_now].y2 + 0.5);// * aspect / 2;
-            // camera2.bottom = - 0.5 * frustumSize / 2;
-            camera2.bottom = camera2.top - camera_length + 0.15;
-            //camera2.bottom = (role[role_now].y1 - 1);// * aspect / -2; 
-            console.log("after");
-            console.log(camera2.left);
-            console.log(camera2.right);
-            console.log(camera2.top);
-            console.log(camera2.bottom);
-            camera2.updateProjectionMatrix();
+            let x_temp = role[role_now].x2 + role[role_now].x_offset;
+            for (let i = 0; i < 4; i++) {
+                small_cameras[i].left = -x_temp;
+                small_cameras[i].right = x_temp;
+                camera_x_range = small_cameras[i].right - small_cameras[i].left;
+                small_cameras[i].top = role[role_now].y2 + 0.5;
+                small_cameras[i].bottom = small_cameras[i].top - camera_x_range;
+                small_cameras[i].updateProjectionMatrix();
+            }
 
-            camera3.left = 0.25 * frustumSize * aspect / - 2;
-            camera3.right = 0.25 * frustumSize * aspect / 2;
-            camera3.top = 0.5 * frustumSize / 2;
-            camera3.bottom = - 0.5 * frustumSize / 2;
-            camera3.updateProjectionMatrix();
-
-            camera4.left = 0.25 * frustumSize * aspect / - 2;
-            camera4.right = 0.25 * frustumSize * aspect / 2;
-            camera4.top = 0.5 * frustumSize / 2;
-            camera4.bottom = - 0.5 * frustumSize / 2;
-            camera4.updateProjectionMatrix();
-
-            camera5.left = 0.25 * frustumSize * aspect / - 2;
+            /* camera5.left = 0.25 * frustumSize * aspect / - 2;
             camera5.right = 0.25 * frustumSize * aspect / 2;
             camera5.top = 0.5 * frustumSize / 2;
             camera5.bottom = - 0.5 * frustumSize / 2;
-            camera5.updateProjectionMatrix();
+            camera5.updateProjectionMatrix(); */
         }
 
         //
@@ -342,16 +317,16 @@
             effect.render(scene, camera);
 
             effect.setViewport(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2);
-            effect.render(scene, camera2);
+            effect.render(scene, small_cameras[0]);
 
             effect.setViewport(SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2);
-            effect.render(scene, camera3);
+            effect.render(scene, small_cameras[1]);
 
             effect.setViewport(SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2);
-            effect.render(scene, camera4);
+            effect.render(scene, small_cameras[2]);
 
             effect.setViewport(SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4, 0, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2);
-            effect.render(scene, camera5);
+            effect.render(scene, small_cameras[3]);
         }
     </script>
 
