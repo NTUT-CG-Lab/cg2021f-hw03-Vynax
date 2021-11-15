@@ -35,6 +35,9 @@ export class Character {
 
         this.x_offset = 0;
         this.y_offset = 0;
+
+        this.eye_now = 0;
+        this.eye_rotations = [];
         // this.mesh = 0;
         this.file_path = file_path;
     }

@@ -253,7 +253,14 @@
                         role[i].set_Visible(false);
                     scene.add(role[i].mesh);
 
-                    console.log("finished?");
+                    let xxx = role[i].mesh.skeleton.bones.findIndex(x => x.name === '左目');
+                    let yyy = role[i].mesh.skeleton.bones.findIndex(x => x.name === '右目');
+                    console.log(xxx);
+                    console.log(yyy);
+
+                    /* for (let obj in role[i].mesh.skeleton.bones)
+                        console.log(obj); */
+
                 }, onProgress, null);
 
             }
@@ -283,7 +290,7 @@
             camera.bottom = - frustumSize / 2;
             camera.updateProjectionMatrix();
 
-            let x_temp = role[role_now].x2 + role[role_now].x_offset;
+            let x_temp = role[role_now].x2 + role[role_now].x_offset * 5;
             for (let i = 0; i < 4; i++) {
                 small_cameras[i].left = -x_temp;
                 small_cameras[i].right = x_temp;
