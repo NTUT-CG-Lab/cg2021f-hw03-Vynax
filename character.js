@@ -36,10 +36,20 @@ export class Character {
         this.x_offset = 0;
         this.y_offset = 0;
 
-        this.eye_now = 0;
+        this.eye_now = 0; //0~7 two eyes in one camera, 4 camera
+        this.eye_total = 8;
         this.eye_rotations = [];
+        this.left_eye_index = 0;
+        this.right_eye_index = 0;
         // this.mesh = 0;
         this.file_path = file_path;
+    }
+    init_Mesh(object) {
+        this.mesh = object;
+        this.mesh.position.y = - 10;
+
+        this.left_eye_index = this.mesh.skeleton.bones.findIndex(x => x.name === '左目');
+        this.right_eye_index = this.mesh.skeleton.bones.findIndex(x => x.name === '右目');
     }
 
     set_Location(json_data) {
@@ -106,21 +116,64 @@ export class Character {
         }
     }
 
+    // true means eye_now + 1
+    // false means eye_now - 1
+    change_Eye(true_or_false) {
+        if (!true_or_false) {
+            if (this.eye_now - 1 < 0)
+                this.eye_now = 0;
+            else
+                this.eye_now = this.eye_now - 1;
+        }
+        else {
+            // total 8 eyes, 0~7
+            if (this.eye_now + 1 > this.eye_total - 1)
+                this.eye_now = this.eye_total - 1;
+            else
+                this.eye_now = this.eye_now + 1;
+        }
+        this.set_Visible(true);
+    }
+
     set_Visible(true_or_false) {
-        /* for (let i = 0; i < this.eye_edges.length; i++) {
-            this.eye_edges[i].line.visible = true_or_false;
-        } */
 
         //左右各5條橫線
         for (let i = 0; i < this.horizon_line; i++) {
-            this.left_horizon_edges[i].line.visible = true_or_false;
-            this.right_horizon_edges[i].line.visible = true_or_false;
+            this.left_horizon_edges[i].line.visible = false;
+            this.right_horizon_edges[i].line.visible = false;
         }
         //左右各9條直線
         for (let i = 0; i < this.vertical_line; i++) {
-            this.left_vertical_edges[i].line.visible = true_or_false;
-            this.right_vertical_edges[i].line.visible = true_or_false;
+            this.left_vertical_edges[i].line.visible = false;
+            this.right_vertical_edges[i].line.visible = false;
         }
+
+        // right eye
+        if (true_or_false) {
+            if (this.eye_now % 2 == 0) {
+                // horizon lines
+                for (let i = 0; i < this.horizon_line; i++) {
+                    this.right_horizon_edges[i].line.visible = true_or_false;
+                }
+
+                // vertical lines
+                for (let i = 0; i < this.vertical_line; i++) {
+                    this.right_vertical_edges[i].line.visible = true_or_false;
+                }
+            }
+            // left eye
+            else {
+                //horizon lines
+                for (let i = 0; i < this.horizon_line; i++) {
+                    this.left_horizon_edges[i].line.visible = true_or_false;
+                }
+                // vertical lines
+                for (let i = 0; i < this.vertical_line; i++) {
+                    this.left_vertical_edges[i].line.visible = true_or_false;
+                }
+            }
+        }
+
         this.mesh.visible = true_or_false;
     }
 

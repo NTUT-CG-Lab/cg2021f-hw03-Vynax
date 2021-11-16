@@ -107,6 +107,14 @@
             const ch = String.fromCharCode(keyCode);
 
             switch (ch) {
+                case '1':
+                    role[role_now].change_Eye(false);
+                    // onWindowResize();
+                    break;
+                case '2':
+                    role[role_now].change_Eye(true);
+                    // onWindowResize();
+                    break;
                 case "q":
                 case "Q":
                     role[role_now].left_copy_to_right(line_amount);
@@ -245,18 +253,19 @@
                 role[i].set_Location(coor_json_data.modellist[i]);
                 loader.load(modelFile[i], function (object) {
 
-                    role[i].mesh = object;
-                    role[i].mesh.position.y = - 10;
+                    role[i].init_Mesh(object);
+                    // role[i].mesh = object;
+                    // role[i].mesh.position.y = - 10;
                     if (i == role_now)
                         role[i].set_Visible(true);
                     else
                         role[i].set_Visible(false);
                     scene.add(role[i].mesh);
 
-                    let xxx = role[i].mesh.skeleton.bones.findIndex(x => x.name === '左目');
+                    /* let xxx = role[i].mesh.skeleton.bones.findIndex(x => x.name === '左目');
                     let yyy = role[i].mesh.skeleton.bones.findIndex(x => x.name === '右目');
                     console.log(xxx);
-                    console.log(yyy);
+                    console.log(yyy); */
 
                     /* for (let obj in role[i].mesh.skeleton.bones)
                         console.log(obj); */
