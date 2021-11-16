@@ -41,7 +41,7 @@
             so.addChild("回答問題", 1, true);
             so.addChild("可按鍵選擇上 / 下一隻角色", 1, true);
             so.addChild("讀取作業 2 儲存的座標點在眼睛上繪製出分割線", 1, true);
-            so.addChild("可選擇當下控制哪個虹膜", 1, false);
+            so.addChild("可選擇當下控制哪個虹膜", 1, true);
             so.addChild("按滑鼠左鍵控制虹膜移動，右鍵停止", 2, false);
             so.addChild("複製參數至對應目標參數", 2, false);
             so.addChild("可儲存虹膜轉動角度", 1, false);
@@ -97,6 +97,7 @@
         let color_hex = [0x008000, 0xFF0000, 0x68c4dd, 0x800080]; // 左眼橫綠直紅，右眼橫藍直紫
         let role = [];
         let role_now = 0;
+        let camera_now = 0;
         let coor_json_data;
         let line_amount = 4;
 
@@ -109,11 +110,11 @@
             switch (ch) {
                 case '1':
                     role[role_now].change_Eye(false);
-                    // onWindowResize();
+                    onWindowResize();
                     break;
                 case '2':
                     role[role_now].change_Eye(true);
-                    // onWindowResize();
+                    onWindowResize();
                     break;
                 case "q":
                 case "Q":
@@ -262,14 +263,6 @@
                         role[i].set_Visible(false);
                     scene.add(role[i].mesh);
 
-                    /* let xxx = role[i].mesh.skeleton.bones.findIndex(x => x.name === '左目');
-                    let yyy = role[i].mesh.skeleton.bones.findIndex(x => x.name === '右目');
-                    console.log(xxx);
-                    console.log(yyy); */
-
-                    /* for (let obj in role[i].mesh.skeleton.bones)
-                        console.log(obj); */
-
                 }, onProgress, null);
 
             }
@@ -293,11 +286,11 @@
 
             effect.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-            camera.left = 0.5 * frustumSize * aspect / - 2;
-            camera.right = 0.5 * frustumSize * aspect / 2;
-            camera.top = frustumSize / 2;
-            camera.bottom = - frustumSize / 2;
-            camera.updateProjectionMatrix();
+            // camera.left = 0.5 * frustumSize * aspect / - 2;
+            // camera.right = 0.5 * frustumSize * aspect / 2;
+            // camera.top = frustumSize / 2;
+            // camera.bottom = - frustumSize / 2;
+            // camera.updateProjectionMatrix();
 
             let x_temp = role[role_now].x2 + role[role_now].x_offset * 5;
             for (let i = 0; i < 4; i++) {
@@ -309,11 +302,27 @@
                 small_cameras[i].updateProjectionMatrix();
             }
 
-            /* camera5.left = 0.25 * frustumSize * aspect / - 2;
-            camera5.right = 0.25 * frustumSize * aspect / 2;
-            camera5.top = 0.5 * frustumSize / 2;
-            camera5.bottom = - 0.5 * frustumSize / 2;
-            camera5.updateProjectionMatrix(); */
+            camera_now = Math.floor(role[role_now].eye_now / 2); //每兩個眼睛一個camera
+            let left_or_right = role[role_now].eye_now % 2; // 右眼是0，左眼是1
+
+            let x1, y1, x2, y2;
+            // camera 的左邊是模型的右邊
+            if (left_or_right == 0) {
+                x1 = -role[role_now].x2;
+                x2 = -role[role_now].x1;
+            }
+            else if (left_or_right == 1) {
+                x1 = role[role_now].x1;
+                x2 = role[role_now].x2;
+            }
+            y1 = role[role_now].y1;
+            y2 = role[role_now].y2;
+
+            camera.left = x1 - role[role_now].x_offset;
+            camera.right = x2 + role[role_now].x_offset;
+            camera.top = y2 + role[role_now].y_offset;
+            camera.bottom = y1 - role[role_now].y_offset;
+            camera.updateProjectionMatrix();
         }
 
         //
@@ -328,11 +337,34 @@
         function render() {
 
             effect.clear();
+            let x, y;
+            role[role_now].reset();
+
+            //原本左下角是第一個camera，現在改成左上角是第一個
+
+            for (let i = 0; i < small_cameras.length; i++) {
+                if (i % 2 == 0)
+                    x = SCREEN_WIDTH / 2;
+                else
+                    x = SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4;
+
+                if (i < 2)
+                    y = SCREEN_HEIGHT / 2;
+                else
+                    y = 0;
+
+                if (i == camera_now)
+                    role[role_now].set_Visible(true);
+                effect.setViewport(x, y, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2);
+                effect.render(scene, small_cameras[i]);
+                role[role_now].reset();
+            }
+            role[role_now].set_Visible(true);
 
             effect.setViewport(0, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT);
             effect.render(scene, camera);
 
-            effect.setViewport(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2);
+            /* effect.setViewport(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2);
             effect.render(scene, small_cameras[0]);
 
             effect.setViewport(SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2);
@@ -342,7 +374,7 @@
             effect.render(scene, small_cameras[2]);
 
             effect.setViewport(SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4, 0, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2);
-            effect.render(scene, small_cameras[3]);
+            effect.render(scene, small_cameras[3]); */
         }
     </script>
 

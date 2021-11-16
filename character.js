@@ -37,11 +37,11 @@ export class Character {
         this.y_offset = 0;
 
         this.eye_now = 0; //0~7 two eyes in one camera, 4 camera
-        this.eye_total = 8;
+        this.eye_total = 8; //總共8隻眼睛
         this.eye_rotations = [];
         this.left_eye_index = 0;
         this.right_eye_index = 0;
-        // this.mesh = 0;
+        this.mesh = 0;
         this.file_path = file_path;
     }
     init_Mesh(object) {
@@ -118,6 +118,20 @@ export class Character {
 
     // true means eye_now + 1
     // false means eye_now - 1
+
+    reset() {
+        //左右各5條橫線
+        for (let i = 0; i < this.horizon_line; i++) {
+            this.left_horizon_edges[i].line.visible = false;
+            this.right_horizon_edges[i].line.visible = false;
+        }
+        //左右各9條直線
+        for (let i = 0; i < this.vertical_line; i++) {
+            this.left_vertical_edges[i].line.visible = false;
+            this.right_vertical_edges[i].line.visible = false;
+        }
+    }
+
     change_Eye(true_or_false) {
         if (!true_or_false) {
             if (this.eye_now - 1 < 0)
@@ -173,8 +187,8 @@ export class Character {
                 }
             }
         }
-
-        this.mesh.visible = true_or_false;
+        if (this.mesh != 0)
+            this.mesh.visible = true_or_false;
     }
 
     make_JSON_point() {
