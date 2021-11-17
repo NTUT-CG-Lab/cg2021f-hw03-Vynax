@@ -276,6 +276,14 @@
             //鏡頭控制
             document.addEventListener('keypress', onDocumentKeyPress);
 
+            // 防右鍵
+            window.addEventListener('contextmenu', function (e) {
+                if (e.button == 2) {
+
+                    e.preventDefault();
+                }
+            }, false);
+
         }
 
         function onWindowResize() {
@@ -353,28 +361,16 @@
                 else
                     y = 0;
 
-                if (i == camera_now)
+                if (i == camera_now) {
                     role[role_now].set_Visible(true);
+                    effect.setViewport(0, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT);
+                    effect.render(scene, camera);
+                }
                 effect.setViewport(x, y, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2);
                 effect.render(scene, small_cameras[i]);
                 role[role_now].reset();
             }
-            role[role_now].set_Visible(true);
 
-            effect.setViewport(0, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT);
-            effect.render(scene, camera);
-
-            /* effect.setViewport(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2);
-            effect.render(scene, small_cameras[0]);
-
-            effect.setViewport(SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2);
-            effect.render(scene, small_cameras[1]);
-
-            effect.setViewport(SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2);
-            effect.render(scene, small_cameras[2]);
-
-            effect.setViewport(SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4, 0, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2);
-            effect.render(scene, small_cameras[3]); */
         }
     </script>
 
