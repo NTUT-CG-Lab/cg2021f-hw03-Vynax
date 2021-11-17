@@ -48,8 +48,12 @@ export class Character {
         this.mesh = object;
         this.mesh.position.y = - 10;
 
-        this.left_eye_index = this.mesh.skeleton.bones.findIndex(x => x.name === '左目');
-        this.right_eye_index = this.mesh.skeleton.bones.findIndex(x => x.name === '右目');
+        // 左右虹膜的索引值
+        this.left_index = this.mesh.skeleton.bones.findIndex(x => x.name === '左目');
+        this.right_index = this.mesh.skeleton.bones.findIndex(x => x.name === '右目');
+
+        this.mesh.skeleton.bones[this.left_index].rotation.x = 0.5;
+        console.log(this.mesh.skeleton.bones[this.left_index].rotation.x);
     }
 
     set_Location(json_data) {
