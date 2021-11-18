@@ -102,6 +102,9 @@
         let line_amount = 4;
         let mouseWorld = new THREE.Vector3();
         let raycaster = new THREE.Raycaster();
+        let mouse = new THREE.Vector2();
+        let first_mouse_y, first_mouse_x;
+        let eye_control_now = -1;
 
         function onDocumentKeyPress(event) {
 
@@ -199,17 +202,47 @@
             }
         }
 
-        function onMousemove(e) {
-            const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+        function onMouse_Left_Click(event) {
+            console.log("himouse_click" + eye_control_now);
+            console.log(event.isPrimary);
+            //不是主要按鍵或是現在有控制某個虹膜就跳出去
+            if (event.button != 0 || eye_control_now != -1) return;
+            eye_control_now = role[role_now].eye_now;
+            role[role_now].get_Last_Angle();
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
 
-            mouseWorld.set(
-                ((e.clientX - left + 1) / width) * 2 - 1,
-                -((e.clientY - top + 1) / height) * 2 + 1,
-                (camera.near + camera.far) / (camera.near - camera.far),
-            );
-            mouseWorld.unproject(camera);
-            console.log(mouseWorld.x + "&" + mouseWorld.y);
+            first_mouse_y = mouse.y;
+
+            document.addEventListener("mousemove", onMouseMove);
+            document.addEventListener("click", onMouse_Right_Click);
+
         }
+
+        function onMouseMove(event) {
+            // Math.floor()
+            // this.last_angle = Math.floor
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+            let mouse_offset = first_mouse_y - mouse.y;
+            role[role_now].set_Angle(mouse_offset);
+        }
+
+        function onMouse_Right_Click(event) {
+            console.log("???");
+            // 如果不是右鍵就跳出去
+            if (event.button != 2) return;
+            document.removeEventListener("mousemove", onMouseMove);
+            document.removeEventListener("click", onMouse_Right_Click);
+
+        }
+
+        /* function onMousemove(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+            // console.log(mouse.x + "&" + mouse.y);
+        } */
 
         function init() {
 
@@ -290,15 +323,13 @@
             //鏡頭控制
             document.addEventListener('keypress', onDocumentKeyPress);
 
+            document.addEventListener('click', onMouse_Left_Click);
             // 防右鍵
-            window.addEventListener('contextmenu', function (e) {
-                if (e.button == 2) {
-
-                    e.preventDefault();
-                }
+            document.addEventListener('contextmenu', function (e) {
+                e.preventDefault();
             }, false);
 
-            document.body.addEventListener('mousemove', onMousemove);
+            // document.body.addEventListener('mousemove', onMousemove);
         }
 
         function onWindowResize() {

@@ -40,7 +40,7 @@ export class Character {
 
         this.eye_now = 0; //0~7 two eyes in one camera, 4 camera
         this.eye_total = 8; //總共8隻眼睛
-        this.eye_rotations = [];
+        this.eye_rotations = []; // 角度 ( 不是弳度 )
         this.eye_control_now = -1;
 
         // 左右虹膜的索引值
@@ -82,33 +82,24 @@ export class Character {
         this.mouseWorld = mouseWorld;
         this.window = window;
     }
-    set_Events() {
-
-        this.document.addEventListener('click', this.onMouse_Left_Click);
+    get_Last_Angle() {
+        let which_camera = Math.floor(this.eye_now / 2);
+        let which_eye = this.eye_now % 2;
+        this.last_angle = this.eye_rotations[which_camera][which_eye];
     }
 
-    onMouse_Left_Click(event) {
-        if (event.isPrimary === false) return;
-
-        this.mouse.x = (event.clientX / this.window.innerWidth) * 2 - 1;
-        this.mouse.y = - (event.clientY / this.window.innerHeight) * 2 + 1;
-        this.document.addEventListener("mousemove", this.onMouseMove);
-        // this.document.addEventListener("click", draw_Click);
-    }
-
-    onMouseMove(event) {
-        // Math.floor()
-        // this.last_angle = Math.floor
-    }
-
-    cancel_All_Event(document) {
-
+    set_Angle(mouse_offset) {
+        let which_camera = Math.floor(this.eye_now / 2);
+        let which_eye = this.eye_now % 2;
+        // mouse_offset * 360 * Math.PI / 180
+        let angle_offset = mouse_offset * 360;
+        this.eye_rotations[which_camera][which_eye] = this.last_angle + angle_offset;
     }
 
     set_Eyes_Radian(which_camera) {
         if (this.mesh != 0) {
-            this.mesh.skeleton.bones[this.right_index].rotation.x = this.eye_rotations[which_camera][0];
-            this.mesh.skeleton.bones[this.left_index].rotation.x = this.eye_rotations[which_camera][1];
+            this.mesh.skeleton.bones[this.right_index].rotation.x = this.eye_rotations[which_camera][0] * Math.PI / 180;
+            this.mesh.skeleton.bones[this.left_index].rotation.x = this.eye_rotations[which_camera][1] * Math.PI / 180;
         }
     }
 
