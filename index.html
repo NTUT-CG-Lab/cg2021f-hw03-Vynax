@@ -100,6 +100,8 @@
         let camera_now = 0;
         let coor_json_data;
         let line_amount = 4;
+        let mouseWorld = new THREE.Vector3();
+        let raycaster = new THREE.Raycaster();
 
         function onDocumentKeyPress(event) {
 
@@ -197,6 +199,18 @@
             }
         }
 
+        function onMousemove(e) {
+            const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+
+            mouseWorld.set(
+                ((e.clientX - left + 1) / width) * 2 - 1,
+                -((e.clientY - top + 1) / height) * 2 + 1,
+                (camera.near + camera.far) / (camera.near - camera.far),
+            );
+            mouseWorld.unproject(camera);
+            console.log(mouseWorld.x + "&" + mouseWorld.y);
+        }
+
         function init() {
 
             const container = document.createElement('div');
@@ -254,7 +268,7 @@
                 role[i].set_Location(coor_json_data.modellist[i]);
                 loader.load(modelFile[i], function (object) {
 
-                    role[i].init_Mesh(object);
+                    role[i].init_Mesh(object, document, raycaster, camera, mouseWorld, window);
                     // role[i].mesh = object;
                     // role[i].mesh.position.y = - 10;
                     if (i == role_now)
@@ -284,6 +298,7 @@
                 }
             }, false);
 
+            document.body.addEventListener('mousemove', onMousemove);
         }
 
         function onWindowResize() {
@@ -346,11 +361,13 @@
 
             effect.clear();
             let x, y;
-            role[role_now].reset();
+            role[role_now].set_Lines_invisible();
 
             //原本左下角是第一個camera，現在改成左上角是第一個
 
             for (let i = 0; i < small_cameras.length; i++) {
+
+                role[role_now].set_Eyes_Radian(i);
                 if (i % 2 == 0)
                     x = SCREEN_WIDTH / 2;
                 else
@@ -368,7 +385,7 @@
                 }
                 effect.setViewport(x, y, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2);
                 effect.render(scene, small_cameras[i]);
-                role[role_now].reset();
+                role[role_now].set_Lines_invisible();
             }
 
         }

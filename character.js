@@ -28,23 +28,39 @@ export class Character {
             scene.add(this.right_vertical_edges[i].line);
         }
 
+        //HW2座標的上下限
         this.x1 = 0;
         this.x2 = 0;
         this.y1 = 0;
         this.y2 = 0;
 
+        // 五條直線、九條橫線的間隔
         this.x_offset = 0;
         this.y_offset = 0;
 
         this.eye_now = 0; //0~7 two eyes in one camera, 4 camera
         this.eye_total = 8; //總共8隻眼睛
         this.eye_rotations = [];
-        this.left_eye_index = 0;
-        this.right_eye_index = 0;
+        this.eye_control_now = -1;
+
+        // 左右虹膜的索引值
+        this.left_index = 0;
+        this.right_index = 0;
+
+        //按下之前虹膜的角度
+        this.last_angle = 0;
+
+        //camera 總數
+        this.camera_amount = 4;
+
+        // 滑鼠座標
+        this.mouseWorld = 0;
+        this.mouse = new THREE.Vector2();
+
         this.mesh = 0;
         this.file_path = file_path;
     }
-    init_Mesh(object) {
+    init_Mesh(object, document, raycaster, camera, mouseWorld, window) {
         this.mesh = object;
         this.mesh.position.y = - 10;
 
@@ -52,8 +68,48 @@ export class Character {
         this.left_index = this.mesh.skeleton.bones.findIndex(x => x.name === '左目');
         this.right_index = this.mesh.skeleton.bones.findIndex(x => x.name === '右目');
 
+        for (let i = 0; i < this.camera_amount; i++) {
+            this.eye_rotations[i] = [];
+            this.eye_rotations[i][0] = 0;
+            this.eye_rotations[i][1] = 0;
+        }
         this.mesh.skeleton.bones[this.left_index].rotation.x = 0.5;
         console.log(this.mesh.skeleton.bones[this.left_index].rotation.x);
+
+        this.document = document;
+        this.raycaster = raycaster;
+        this.camera = camera;
+        this.mouseWorld = mouseWorld;
+        this.window = window;
+    }
+    set_Events() {
+
+        this.document.addEventListener('click', this.onMouse_Left_Click);
+    }
+
+    onMouse_Left_Click(event) {
+        if (event.isPrimary === false) return;
+
+        this.mouse.x = (event.clientX / this.window.innerWidth) * 2 - 1;
+        this.mouse.y = - (event.clientY / this.window.innerHeight) * 2 + 1;
+        this.document.addEventListener("mousemove", this.onMouseMove);
+        // this.document.addEventListener("click", draw_Click);
+    }
+
+    onMouseMove(event) {
+        // Math.floor()
+        // this.last_angle = Math.floor
+    }
+
+    cancel_All_Event(document) {
+
+    }
+
+    set_Eyes_Radian(which_camera) {
+        if (this.mesh != 0) {
+            this.mesh.skeleton.bones[this.right_index].rotation.x = this.eye_rotations[which_camera][0];
+            this.mesh.skeleton.bones[this.left_index].rotation.x = this.eye_rotations[which_camera][1];
+        }
     }
 
     set_Location(json_data) {
@@ -120,10 +176,7 @@ export class Character {
         }
     }
 
-    // true means eye_now + 1
-    // false means eye_now - 1
-
-    reset() {
+    set_Lines_invisible() {
         //左右各5條橫線
         for (let i = 0; i < this.horizon_line; i++) {
             this.left_horizon_edges[i].line.visible = false;
@@ -135,6 +188,9 @@ export class Character {
             this.right_vertical_edges[i].line.visible = false;
         }
     }
+
+    // true means eye_now + 1
+    // false means eye_now - 1
 
     change_Eye(true_or_false) {
         if (!true_or_false) {
@@ -155,16 +211,7 @@ export class Character {
 
     set_Visible(true_or_false) {
 
-        //左右各5條橫線
-        for (let i = 0; i < this.horizon_line; i++) {
-            this.left_horizon_edges[i].line.visible = false;
-            this.right_horizon_edges[i].line.visible = false;
-        }
-        //左右各9條直線
-        for (let i = 0; i < this.vertical_line; i++) {
-            this.left_vertical_edges[i].line.visible = false;
-            this.right_vertical_edges[i].line.visible = false;
-        }
+        this.set_Lines_invisible();
 
         // right eye
         if (true_or_false) {
