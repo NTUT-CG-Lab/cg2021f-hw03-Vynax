@@ -94,7 +94,13 @@ export class Character {
         let which_eye = this.eye_now % 2;
         // mouse_offset * 360 * Math.PI / 180
         let angle_offset = mouse_offset * 45; // 原本 * 360，但是轉太多
-        this.eye_rotations[which_camera][which_eye] = this.last_angle + angle_offset;
+        let angle;
+        // 上下分開，下面四個左右轉，加負號是因為不加方向會跟滑鼠方向相反
+        if (which_camera >= 2)
+            angle = this.last_angle - angle_offset;
+        else
+            angle = this.last_angle + angle_offset; // 這是原本上半部的上下轉部分
+        this.eye_rotations[which_camera][which_eye] = angle;
     }
 
     set_Eyes_Radian(which_camera) {
@@ -104,10 +110,10 @@ export class Character {
                 this.mesh.skeleton.bones[this.right_index].rotation.x = this.eye_rotations[which_camera][0] * Math.PI / 180;
                 this.mesh.skeleton.bones[this.left_index].rotation.x = this.eye_rotations[which_camera][1] * Math.PI / 180;
             }
-            // 下面四個左右轉，加負號是因為不加方向會跟滑鼠方向相反
+            // 下面四個左右轉
             else {
-                this.mesh.skeleton.bones[this.right_index].rotation.y = -this.eye_rotations[which_camera][0] * Math.PI / 180;
-                this.mesh.skeleton.bones[this.left_index].rotation.y = -this.eye_rotations[which_camera][1] * Math.PI / 180;
+                this.mesh.skeleton.bones[this.right_index].rotation.y = this.eye_rotations[which_camera][0] * Math.PI / 180;
+                this.mesh.skeleton.bones[this.left_index].rotation.y = this.eye_rotations[which_camera][1] * Math.PI / 180;
             }
         }
     }
