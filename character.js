@@ -175,19 +175,29 @@ export class Character {
         this.eye_edges[edge_now].set_Line_Points(point1, point2);
     }
 
-    left_copy_to_right(line_amount) {
-        let temp_Vector3 = [];
-        for (let i = line_amount; i < line_amount * 2; i++) {
-            temp_Vector3[0] = new THREE.Vector3().copy(this.eye_edges[i - line_amount].points[0]);
-            temp_Vector3[1] = new THREE.Vector3().copy(this.eye_edges[i - line_amount].points[1]);
-
-
-            temp_Vector3[0].setX(-temp_Vector3[0].x);
-            temp_Vector3[1].setX(-temp_Vector3[1].x);
-
-            this.eye_edges[i].set_Line_Points(temp_Vector3[0], temp_Vector3[1]);
-
-            // console.log("1:" + this.eye_edges[i - line_amount].points[0].x + "2:" + this.eye_edges[i - line_amount].points[1].x);
+    override_eye_angle() {
+        // 虹膜編號是由左而右，由上而下，所以0~3是上半部，4~7是下半部
+        switch (this.eye_now) {
+            // 第一個畫面的右眼複製到第一個畫面的左眼
+            case 0:
+                this.eye_rotations[0][1] = this.eye_rotations[0][0];
+                this.eye_now = 1;
+                break;
+            // 第二個畫面的右眼複製到第二個畫面的左眼
+            case 2:
+                this.eye_rotations[1][1] = this.eye_rotations[1][0];
+                this.eye_now = 3;
+                break;
+            // 第三個畫面的右眼複製到第四個畫面的左眼
+            case 4:
+                this.eye_rotations[3][1] = -this.eye_rotations[2][0];
+                this.eye_now = 7;
+                break;
+            // 第四個畫面的右眼複製到第三個畫面的左眼
+            case 6:
+                this.eye_rotations[2][1] = -this.eye_rotations[3][0];
+                this.eye_now = 5;
+                break;
         }
     }
 
