@@ -223,6 +223,7 @@
             role[role_now].get_Last_Angle();
 
             first_mouse_y = mouse.y;
+            first_mouse_x = mouse.x;
 
             document.addEventListener("mousemove", onMouseMove);
             document.body.addEventListener('mouseup', onMouse_Right_Click);
@@ -235,7 +236,11 @@
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
 
-            let mouse_offset = first_mouse_y - mouse.y;
+            let mouse_offset;
+            if (eye_control_now < 4)
+                mouse_offset = first_mouse_y - mouse.y;
+            else
+                mouse_offset = first_mouse_x - mouse.x;
             role[role_now].set_Angle(mouse_offset);
         }
 
@@ -430,6 +435,7 @@
                 effect.setViewport(x, y, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2);
                 effect.render(scene, small_cameras[i]);
                 role[role_now].set_Lines_invisible();
+                role[role_now].set_Eyes_Radian_Zero();
             }
 
         }

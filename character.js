@@ -99,8 +99,25 @@ export class Character {
 
     set_Eyes_Radian(which_camera) {
         if (this.mesh != 0) {
-            this.mesh.skeleton.bones[this.right_index].rotation.x = this.eye_rotations[which_camera][0] * Math.PI / 180;
-            this.mesh.skeleton.bones[this.left_index].rotation.x = this.eye_rotations[which_camera][1] * Math.PI / 180;
+            // 上面四個上下轉
+            if (which_camera < 2) {
+                this.mesh.skeleton.bones[this.right_index].rotation.x = this.eye_rotations[which_camera][0] * Math.PI / 180;
+                this.mesh.skeleton.bones[this.left_index].rotation.x = this.eye_rotations[which_camera][1] * Math.PI / 180;
+            }
+            // 下面四個左右轉，加負號是因為不加方向會跟滑鼠方向相反
+            else {
+                this.mesh.skeleton.bones[this.right_index].rotation.y = -this.eye_rotations[which_camera][0] * Math.PI / 180;
+                this.mesh.skeleton.bones[this.left_index].rotation.y = -this.eye_rotations[which_camera][1] * Math.PI / 180;
+            }
+        }
+    }
+
+    set_Eyes_Radian_Zero() {
+        if (this.mesh != 0) {
+            this.mesh.skeleton.bones[this.right_index].rotation.x = 0;
+            this.mesh.skeleton.bones[this.left_index].rotation.x = 0;
+            this.mesh.skeleton.bones[this.right_index].rotation.y = 0;
+            this.mesh.skeleton.bones[this.left_index].rotation.y = 0;
         }
     }
 
