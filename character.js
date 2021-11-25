@@ -54,13 +54,12 @@ export class Character {
         this.camera_amount = 4;
 
         // 滑鼠座標
-        this.mouseWorld = 0;
         this.mouse = new THREE.Vector2();
 
         this.mesh = 0;
         this.file_path = file_path;
     }
-    init_Mesh(object, document, raycaster, camera, mouseWorld, window) {
+    init_Mesh(object) {
         this.mesh = object;
         this.mesh.position.y = - 10;
 
@@ -75,13 +74,15 @@ export class Character {
         }
         this.mesh.skeleton.bones[this.left_index].rotation.x = 0.5;
         console.log(this.mesh.skeleton.bones[this.left_index].rotation.x);
-
-        this.document = document;
-        this.raycaster = raycaster;
-        this.camera = camera;
-        this.mouseWorld = mouseWorld;
-        this.window = window;
     }
+
+    get_now_angle() {
+        let which_camera = Math.floor(this.eye_now / 2);
+        let which_eye = this.eye_now % 2;
+        let angle = this.eye_rotations[which_camera][which_eye]
+        console.log("which_eye:" + this.eye_now + ":" + "angle = " + angle);
+    }
+
     get_Last_Angle() {
         let which_camera = Math.floor(this.eye_now / 2);
         let which_eye = this.eye_now % 2;
@@ -92,7 +93,7 @@ export class Character {
         let which_camera = Math.floor(this.eye_now / 2);
         let which_eye = this.eye_now % 2;
         // mouse_offset * 360 * Math.PI / 180
-        let angle_offset = mouse_offset * 360;
+        let angle_offset = mouse_offset * 45; // 原本 * 360，但是轉太多
         this.eye_rotations[which_camera][which_eye] = this.last_angle + angle_offset;
     }
 

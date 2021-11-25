@@ -205,13 +205,22 @@
 
         function onMouse_Left_Click(event) {
             // console.log("himouse_click" + eye_control_now);
-            console.log("which_button:" + event.button);
-            //不是主要按鍵或是現在有控制某個虹膜就跳出去
+            // console.log("which_button:" + event.button);
+            //不是主要按鍵或是當下已經有控制某個虹膜就跳出去
             if (event.button != 0 || eye_control_now != -1) return;
-            eye_control_now = role[role_now].eye_now;
-            role[role_now].get_Last_Angle();
+
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+            //沒點到虹膜也跳出去 目前失敗
+            /* raycaster.setFromCamera(mouse, camera);
+            let intersects = raycaster.intersectObjects(role[role_now].eye_now_object());
+            console.log(intersects);
+            if (intersects.length == 0) return; */
+
+            //
+            eye_control_now = role[role_now].eye_now;
+            role[role_now].get_Last_Angle();
 
             first_mouse_y = mouse.y;
 
@@ -231,11 +240,12 @@
         }
 
         function onMouse_Right_Click(event) {
-            console.log("???" + temp);
+            // console.log("???" + temp);
             temp++;
             // 如果不是右鍵就跳出去
             if (event.button != 2) return;
             eye_control_now = -1;
+            role[role_now].get_now_angle();
             document.removeEventListener("mousemove", onMouseMove);
             document.body.removeEventListener('mouseup', onMouse_Right_Click);
 
@@ -304,7 +314,7 @@
                 role[i].set_Location(coor_json_data.modellist[i]);
                 loader.load(modelFile[i], function (object) {
 
-                    role[i].init_Mesh(object, document, raycaster, camera, mouseWorld, window);
+                    role[i].init_Mesh(object);
                     // role[i].mesh = object;
                     // role[i].mesh.position.y = - 10;
                     if (i == role_now)
